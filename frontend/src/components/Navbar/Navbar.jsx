@@ -1,119 +1,38 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import "./Navbar.css";
 import { assets } from "../../assets/assets";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { StoreContext } from "../../context/StoreContext";
 
-// List of all food items
-const allFoodItems = [
-  "Apple",
-  "Avocado",
-  "Banana",
-  "Bacon",
-  "Bagel",
-  "Barbecue",
-  "Biryani",
-  "Bread",
-  "Broccoli",
-  "Burger",
-  "Cake",
-  "Carrot",
-  "Cheese",
-  "Chicken",
-  "Chips",
-  "Chowmein",
-  "Corn",
-  "Croissant",
-  "Curry",
-  "Doughnut",
-  "Egg",
-  "Eggplant",
-  "Falafel",
-  "Fries",
-  "Garlic Bread",
-  "Grapes",
-  "Grilled Chicken",
-  "Hamburger",
-  "Hotdog",
-  "Ice Cream",
-  "Lasagna",
-  "Lettuce",
-  "Mango",
-  "Muffin",
-  "Noodles",
-  "Omelette",
-  "Orange",
-  "Pancake",
-  "Pasta",
-  "Pizza",
-  "Popcorn",
-  "Pudding",
-  "Quinoa",
-  "Rice",
-  "Salad",
-  "Samosa",
-  "Sandwich",
-  "Sausage",
-  "Soda",
-  "Soup",
-  "Spaghetti",
-  "Spinach",
-  "Steak",
-  "Sushi",
-  "Tacos",
-  "Tea",
-  "Toast",
-  "Tomato",
-  "Turkey",
-  "Waffle",
-  "Watermelon",
-  "Yogurt",
-  "Zucchini",
-];
-
-const Navbar = ({ setShowLogin }) => {
+const Navbar = ({ setShowLogin, setFilteredMenu }) => {
   const [menu, setMenu] = useState("Home");
-  const [showSearchInput, setShowSearchInput] = useState(false); // State to toggle search input
-  const [searchQuery, setSearchQuery] = useState(""); // State to capture search input
-  const [filteredSuggestions, setFilteredSuggestions] = useState([]); // State to store filtered suggestions
-  const { getTotalCartAmount } = useContext(StoreContext);
+  const { getTotalCartAmount, token, setToken } = useContext(StoreContext);
+  const [searchQuery, setSearchQuery] = useState(""); 
+  const navigate = useNavigate();
 
-  const handleSearchIconClick = () => {
-    setShowSearchInput(!showSearchInput); // Toggle search input visibility
+  const logout = () => {
+    localStorage.removeItem("token");
+    setToken("");
+    navigate("/");
   };
 
-  const handleSearch = (event) => {
-    event.preventDefault();
-    // Logic to handle search functionality (e.g., filtering, routing to search results)
-    console.log("Search query:", searchQuery);
-  };
-
-  // Handle search input change and filter suggestions
-  const handleInputChange = (event) => {
-    const query = event.target.value;
-    setSearchQuery(query);
-
-    if (query.length > 0) {
-      const filtered = allFoodItems.filter((item) =>
-        item.toLowerCase().startsWith(query.toLowerCase())
-      );
-      setFilteredSuggestions(filtered);
-    } else {
-      setFilteredSuggestions([]);
+  // Handle search functionality
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      setFilteredMenu(searchQuery.trim().toLowerCase());
     }
-  };
-
-  // Handle suggestion click to fill the input
-  const handleSuggestionClick = (suggestion) => {
-    setSearchQuery(suggestion);
-    setFilteredSuggestions([]); // Clear suggestions after selection
   };
 
   return (
     <div className="navbar">
-      <Link to="/">
-        <img src={assets.newlogo} alt="" className="logo" />
-      </Link>
+      {/* Left Section */}
+      <div className="navbar-left">
+        <Link to="/">
+          <img src={assets.newlogo} alt="Logo" className="logo" />
+        </Link>
+      </div>
+
+      {/* Menu */}
       <ul className="navbar-menu">
         <Link
           to="/"
@@ -141,58 +60,66 @@ const Navbar = ({ setShowLogin }) => {
           onClick={() => setMenu("Mobile-app")}
           className={menu === "Mobile-app" ? "active" : ""}
         >
-          Mobile-app
+          Mobile App
         </a>
       </ul>
 
+      {/* Right Section */}
       <div className="navbar-right">
-        {/* Search Icon */}
-        <div className="navbar-search-icon" onClick={handleSearchIconClick}>
-          <img src={assets.search_icon} alt="Search" />
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Search for food items or more"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleSearch} 
+            className="search-input"
+          />
         </div>
 
-        {/* Search Input */}
-        {showSearchInput && (
-          <div className="search-container">
-            <form onSubmit={handleSearch} className="search-form">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={handleInputChange}
-                placeholder="Search food items..."
-                className="search-input"
-              />
-              <button type="submit" className="search-button">
-                Go
-              </button>
-            </form>
+        {/* Cart */}
+        <div className="navbar-cart">
+          <Link to="/cart">
+            <img src={assets.basket_icon} alt="Cart" className="icon" />
+          </Link>
+          {getTotalCartAmount() > 0 && <div className="cart-badge"></div>}
+        </div>
 
-            {/* Suggestions List */}
-            {filteredSuggestions.length > 0 && (
-              <ul className="suggestions-list">
-                {filteredSuggestions.map((suggestion, index) => (
-                  <li
-                    key={index}
-                    onClick={() => handleSuggestionClick(suggestion)}
-                  >
-                    {suggestion}
-                  </li>
-                ))}
-              </ul>
-            )}
+        {/* Profile Section */}
+        {!token ? (
+          <button
+            onClick={() => setShowLogin(true)}
+            aria-label="Sign In"
+            className="navbar-button"
+          >
+            Sign In
+          </button>
+        ) : (
+          <div className="navbar-profile" role="menu" aria-label="User Profile">
+            <img
+              src={assets.profile_icon}
+              alt="Profile"
+              className="icon"
+              tabIndex={0}
+              aria-haspopup="true"
+            />
+            <ul className="profile-dropdown" role="menu">
+              <li
+                onClick={() => navigate("/myorders")}
+                role="menuitem"
+                tabIndex={0}
+              >
+                <img src={assets.bag_icon} alt="Orders Icon" />
+                Orders
+              </li>
+              <hr />
+              <li onClick={logout} role="menuitem" tabIndex={0}>
+                <img src={assets.logout_icon} alt="Logout Icon" />
+                Logout
+              </li>
+            </ul>
           </div>
         )}
-
-        {/* Cart Icon */}
-        <div className="navbar-search-icon">
-          <Link to="/cart">
-            <img src={assets.basket_icon} alt="" />
-          </Link>
-          <div className={getTotalCartAmount() === 0 ? "" : "dot"}></div>
-        </div>
-
-        {/* Sign In Button */}
-        <button onClick={() => setShowLogin(true)}>Sign in</button>
       </div>
     </div>
   );

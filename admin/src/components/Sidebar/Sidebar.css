@@ -1,0 +1,10 @@
+@media(max-width:900px){
+    .sidebar-option p{
+        display: none;
+    }
+}
+
+.sidebar-option.active{
+    background-color: #fff0ed;
+    border-color: rgb(229, 103, 57);
+}
