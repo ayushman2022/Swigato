@@ -34,14 +34,12 @@ Here are the key features of **SWIGATO – Food Ordering Website**:
 
 ### **3. Performance & Optimization**  
 ✔ **React Hooks & State Management** – Ensures efficient data handling and faster rendering.  
-✔ **Lazy Loading & Code Splitting** – Enhances page load speed and performance.  
 ✔ **Optimized CSS & Animations** – Ensures smooth transitions and visual appeal.  
 
 ### **4. Additional Features (Future Enhancements)**  
 ✔ **Payment Integration** – Secure online payments (Razorpay, Stripe, etc.).  
 ✔ **Restaurant Dashboard** – Enables restaurant owners to manage menus, orders, and analytics.  
-✔ **User Reviews & Ratings** – Customers can leave feedback for restaurants and dishes.  
-✔ **Dark Mode Support** – Provides a customizable user experience.  
+✔ **User Reviews & Ratings** – Customers can leave feedback for restaurants and dishes. 
 
 Let me know if you’d like to add or modify anything! 🚀
 
